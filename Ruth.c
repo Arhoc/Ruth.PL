@@ -12,7 +12,7 @@ char* base64_encode(const unsigned char* input, int length) {
 
     stream = fmemopen(buffer, encoded_size + 1, "w");
     b64 = BIO_new(BIO_f_base64());
-    bio = BIO_new_fp(stream, BIO_NOCLOSE);
+    bio = BIO_new_fp(stream, BIO_NOCLOSE);https://github.com/Arhoc
     BIO_push(b64, bio);
     BIO_set_flags(b64, BIO_FLAGS_BASE64_NO_NL);
     BIO_write(b64, input, length);
@@ -34,7 +34,6 @@ int main(int argc, char* argv[]) {
     char* obf_pl = NULL;
     char* orig_pl = NULL;
 
-    // Leer contenido del archivo de entrada
     FILE* file = fopen(filename, "r");
     if (file == NULL) {
         printf("Error opening file: %s\n", filename);
@@ -49,7 +48,7 @@ int main(int argc, char* argv[]) {
     orig_pl[file_size] = '\0';
 
     for (int i = 0; i < iterations; i++) {
-        char* v = "base64"; // random.choice(variants)
+        char* v = "base64";
         char* pl_func = NULL;
         char* base = NULL;
 
@@ -59,18 +58,15 @@ int main(int argc, char* argv[]) {
             base = strdup(encoded);
             free(encoded);
 
-            // La variable `obf_pl` debe contener la cadena generada en C
             char* obf_pl_template = "eval(\"use MIME::Base64;eval decode_base64('%s');\")";
             int obf_pl_len = strlen(obf_pl_template) + strlen(base) + 1;
             obf_pl = (char*)malloc(obf_pl_len);
             sprintf(obf_pl, obf_pl_template, base);
 
-            // Actualizar el valor de `orig_pl` con la cadena `obf_pl`
             free(orig_pl);
             orig_pl = strdup(obf_pl);
         }
 
-        // Escribir `obf_pl` en el archivo "fusca.pl"
         FILE* f = fopen("fusca.pl", "w");
         if (f == NULL) {
             printf("Error opening file: fusca.pl\n");
@@ -81,11 +77,9 @@ int main(int argc, char* argv[]) {
         fputs(obf_pl, f);
         fclose(f);
 
-        // Liberar memoria de `obf_pl` si se asignó
         free(obf_pl);
     }
 
-    // Liberar memoria de `orig_pl` si se asignó
     free(orig_pl);
 
     return 0;
